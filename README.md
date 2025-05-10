@@ -5,7 +5,6 @@ This is a basic CRUD application built using **Flask** and **SQLite**. The app a
 ## Features:
 - Add new tasks
 - View all tasks
-- Edit existing tasks
 - Delete tasks
 
 ## How to Run the App:
