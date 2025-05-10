@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+    
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+    
+        form {
+            max-width: 400px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+    
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    
+        button:hover {
+            background-color: #2980b9;
+        }
+    
+        #taskList {
+            max-width: 600px;
+            margin: 20px auto;
+            list-style-type: none;
+            padding: 0;
+        }
+    
+        #taskList li {
+            background: white;
+            margin-bottom: 10px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    
+        #taskList li span {
+            flex-grow: 1;
+        }
+    
+        #taskList button {
+            background-color: #e74c3c;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    
+        #taskList button:hover {
+            background-color: #c0392b;
+        }
+    </style>
+    
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <form id="addTaskForm">
+        <input type="text" id="title" placeholder="Task Title" required>
+        <textarea id="description" placeholder="Task Description" required></textarea>
+        <button type="submit">Add Task</button>
+    </form>
+    <ul id="taskList"></ul>
+
+    <script>
+        // Fetch and display tasks
+    async function fetchTasks() {
+        const response = await fetch('/tasks');
+        const tasks = await response.json();
+        const taskList = document.getElementById('taskList');
+        taskList.innerHTML = ''; // Clear current task list
+
+        // Loop through tasks and display each one
+        tasks.forEach(task => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span><strong>${task[1]}</strong>: ${task[2]}</span> <button onclick="deleteTask(${task[0]})">Delete</button>`;
+
+            taskList.appendChild(li);
+        });
+    }
+
+    // Add task
+    document.getElementById('addTaskForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('description').value;
+        
+        await fetch('/tasks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, description })
+        });
+
+        // Refresh task list
+        fetchTasks();
+    });
+    // DELETE task function
+    async function deleteTask(id) {
+        await fetch(`/tasks/${id}`, {
+            method: 'DELETE'
+        });
+        fetchTasks(); // Refresh list after deleting
+    }
+
+    // Initial fetch when the page loads
+    fetchTasks();
+    </script>
+</body>
+</html>
